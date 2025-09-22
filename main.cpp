@@ -6,11 +6,11 @@
 using vvd = std::vector<std::vector<double>>;
 using vd = std::vector<double>;
 
-///Не нужно в 1 задаче
+
 bool check_max_diag(const int n, const vvd &matrix)  {// TODO: wtf как поравнять и в строках и в столбцах
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
-            if (i != j && matrix[i][i] <= matrix[i][j]) {
+            if (i != j && (matrix[i][i] <= matrix[i][j] || matrix[j][j] <= matrix[i][j])) {
                 return false;
             }
         }
@@ -21,6 +21,8 @@ bool check_max_diag(const int n, const vvd &matrix)  {// TODO: wtf как пор
 enum {
     SUCCESS,
     INVALID_MATRIX,
+    ZERO_DET,
+    NO_DIAG_DOMINATION,
     ERROR
 };
 
@@ -28,13 +30,19 @@ void ValidateCode(const int code) {
     switch (code) {
         case SUCCESS:
             printf("SUCCESS\n");
-            return;
+        return;
         case ERROR:
             printf("ERROR\n");
-            return;
+        return;
         case INVALID_MATRIX:
-            printf("INVALID_MATRIX\n");
-            return;
+            printf("First element cant be zero.\n");
+        return;
+        case NO_DIAG_DOMINATION:
+            printf("There is no diagonal domination.\n");
+        return;
+        case ZERO_DET:
+            printf("There is no single solution.\n");
+        return;
         default:
             printf("why are u here?\n");
         return;
@@ -118,8 +126,14 @@ void splitLU(const int n, const vvd &matrix, vvd &L, vvd &U) {
 }
 
 int solve(const int n, const vvd &matrixA, const vd &b, vd &x) {
-    if (matrixA[0][0] == 0 || matrixDet(n, matrixA) == 0) {
+    if (matrixA[0][0] == 0) {
         return INVALID_MATRIX;
+    }
+    if (!check_max_diag(n, matrixA)) {
+        return NO_DIAG_DOMINATION;
+    }
+    if (matrixDet(n, matrixA) == 0) {
+        return ZERO_DET;
     }
 
     vvd L(n, vd(n)), U(n, vd(n));
@@ -164,13 +178,13 @@ int main() {
         b[i] = elem;
     }
     vd X(n);
-    if (const int code = solve(n, matrixA, b, X) != SUCCESS) {
+    if (int code; (code = solve(n, matrixA, b, X)) != SUCCESS) {
         ValidateCode(code);
+        return code;
     }
     for (int i = 0; i < n; ++i) {
         std::cout << X[i] << "\n";
     }
-//    check_max_diag(n, matrixA);
 }
 // 1 2 -2 6 24
 // -3 -5 14 13 41
