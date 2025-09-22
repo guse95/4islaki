@@ -24,6 +24,23 @@ enum {
     ERROR
 };
 
+void ValidateCode(const int code) {
+    switch (code) {
+        case SUCCESS:
+            printf("SUCCESS\n");
+            return;
+        case ERROR:
+            printf("ERROR\n");
+            return;
+        case INVALID_MATRIX:
+            printf("INVALID_MATRIX\n");
+            return;
+        default:
+            printf("why are u here?\n");
+        return;
+    }
+}
+
 double matrixDet(const int n, const vvd &matrix) { //в тупую
     switch (n) {
         case 1:
@@ -59,10 +76,11 @@ double matrixDet(const int n, const vvd &matrix) { //в тупую
 
 void splitLU(const int n, const vvd &matrix, vvd &L, vvd &U) {
     for (int k = 0; k < n; ++k) {
-        U[1][k] = matrix[1][k];
+        U[0][k] = matrix[0][k];
     }
+    L[0][0] = 1;
     for (int k = 1; k < n; ++k) {
-        L[k][1] = matrix[k][1] / U[1][k];
+        L[k][0] = matrix[k][0] / U[0][0];
     }
 
     //первые 3 строчки и столбца по отдельности
@@ -83,10 +101,10 @@ void splitLU(const int n, const vvd &matrix, vvd &L, vvd &U) {
     for (int i = 1; i < n; ++i){
         for (int k = i; k < n; ++k) {
             U[i][k] = matrix[i][k];
-            for (int j = 1; j < i; ++j) {
+            for (int j = 0; j < i; ++j) {
                 U[i][k] -= L[i][j] * U[j][k];
                 if (k != i) {
-                    L[k][i] = L[k][j] * U[j][i];
+                    L[k][i] -= L[k][j] * U[j][i];
                 }
             }
             if (k != i) {
@@ -99,14 +117,34 @@ void splitLU(const int n, const vvd &matrix, vvd &L, vvd &U) {
     }
 }
 
-int solve(const int n, const vvd &matrixA, const vd &b, vd &X) {
+int solve(const int n, const vvd &matrixA, const vd &b, vd &x) {
     if (matrixA[0][0] == 0 || matrixDet(n, matrixA) == 0) {
         return INVALID_MATRIX;
     }
 
-    vvd L(n), U(n);
+    vvd L(n, vd(n)), U(n, vd(n));
     splitLU(n, matrixA, L, U);
+    vd z(n);
 
+    //Lz = b
+    z[0] = b[0];
+    for (int i = 1; i < n; ++i) {
+        z[i] = b[i];
+        for (int j = 0; j < i; ++j) {
+            z[i] -= L[i][j] * z[j];
+        }
+    }
+
+    //Ux = z
+    x[n - 1] = z[n - 1] / U[n - 1][n - 1];
+    for (int i = n - 2; i >= 0; --i) {
+        x[i] = z[i];
+        for (int j = i + 1; j < n; ++j) {
+            x[i] -= U[i][j] * x[j];
+        }
+        x[i] /= U[i][i];
+    }
+    return SUCCESS;
 }
 
 int main() {
@@ -125,7 +163,16 @@ int main() {
         std::cin >> elem;
         b[i] = elem;
     }
-
+    vd X(n);
+    if (const int code = solve(n, matrixA, b, X) != SUCCESS) {
+        ValidateCode(code);
+    }
+    for (int i = 0; i < n; ++i) {
+        std::cout << X[i] << "\n";
+    }
 //    check_max_diag(n, matrixA);
-    //TODO: функция по разложению на матрицы LU
 }
+// 1 2 -2 6 24
+// -3 -5 14 13 41
+// 1 2 -2 -2 0
+// -2 -4 5 10 20
