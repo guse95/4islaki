@@ -125,22 +125,9 @@ void splitLU(const int n, const vvd &matrix, vvd &L, vvd &U) {
     }
 }
 
-int solve(const int n, const vvd &matrixA, const vd &b, vd &x) {
-    if (matrixA[0][0] == 0) {
-        return INVALID_MATRIX;
-    }
-    if (!check_max_diag(n, matrixA)) {
-        return NO_DIAG_DOMINATION;
-    }
-    if (matrixDet(n, matrixA) == 0) {
-        return ZERO_DET;
-    }
-
-    vvd L(n, vd(n)), U(n, vd(n));
-    splitLU(n, matrixA, L, U);
-    vd z(n);
-
+int solve(const int n, const vvd &L, const vvd &U, const vd &b, vd &x) {
     //Lz = b
+    vd z(n);
     z[0] = b[0];
     for (int i = 1; i < n; ++i) {
         z[i] = b[i];
@@ -161,24 +148,75 @@ int solve(const int n, const vvd &matrixA, const vd &b, vd &x) {
     return SUCCESS;
 }
 
+int inverseMatrix(const int n, const vvd &matrixA, vvd &Ansv) {
+    vvd L(n, vd(n)), U(n, vd(n));
+    splitLU(n, matrixA, L, U);
+
+    for (int i = 0; i < n; ++i) {
+        vd b(n);
+        vd x(n);
+        b[i] = 1;
+        int code;
+        if ((code = solve(n, L, U, b, x)) != SUCCESS) {
+            return code;
+        }
+        for (int j = 0; j < n; ++j) {
+            Ansv[j][i] = b[j];
+        }
+    }
+}
+
+int DetLU(const int n, const vvd &matrixA) {
+    vvd L(n, vd(n));
+    vvd U(n, vd(n));
+    splitLU(n, matrixA, L, U);
+    int det = 1;
+    for (int i = 0; i < n; ++i) {
+        det *= U[i][i];
+    }
+    return det;
+}
+
 int main() {
     int n;
     double elem;
     std::cout << "Input number of variables:\n";
     std::cin >> n;
-    std::cout << "Input matrix:\n";
-    vvd matrixA(n, vd(n));
-    vd b(n);
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
-            std::cin >> elem;
-            matrixA[i][j] = elem;
-        }
-        std::cin >> elem;
-        b[i] = elem;
+
+    vvd matrixA = {{-4, -9, 4, 3},
+                   {2, 7, 9, 8},
+                   {4, -4, 0, -2},
+                   {-8, 5, 2, 9}};
+    vd b = {-52, 76, 26, -73};
+//    vvd matrixA = {{-11, -8, 0, 0, 0},
+//                   {9, -17, 1, 0, 0, 0},
+//                   {0, -4, 20, 9, 0},
+//                   {0, 0, -4, 14, 3},
+//                   {0, 0, 0, -6, 14}};
+//    vd b = {99, -75, 66, 54, 8};
+
+    //    std::cout << "Input matrix:\n";
+//    for (int i = 0; i < n; ++i) {
+//        for (int j = 0; j < n; ++j) {
+//            std::cin >> elem;
+//            matrixA[i][j] = elem;
+//        }
+//        std::cin >> elem;
+//        b[i] = elem;
+//    }
+
+    if (matrixA[0][0] == 0) {
+        return INVALID_MATRIX;
+    }
+    if (matrixDet(n, matrixA) == 0) {
+        return ZERO_DET;
     }
     vd X(n);
-    if (int code; (code = solve(n, matrixA, b, X)) != SUCCESS) {
+    vvd L(n, vd(n));
+    vvd U(n, vd(n));
+    splitLU(n, matrixA, L, U);
+
+    if (int code; (code = solve(n, L, U, b, X)) != SUCCESS) {
         ValidateCode(code);
         return code;
     }
@@ -186,7 +224,3 @@ int main() {
         std::cout << X[i] << "\n";
     }
 }
-// 1 2 -2 6 24
-// -3 -5 14 13 41
-// 1 2 -2 -2 0
-// -2 -4 5 10 20
