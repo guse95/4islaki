@@ -1,3 +1,4 @@
+#define p 1
 #include <cmath>
 #include <iostream>
 #include <math.h>
@@ -7,16 +8,19 @@ using vvd = std::vector<std::vector<double>>;
 using vd = std::vector<double>;
 
 
-bool check_max_diag(const int n, const vvd &matrix)  {// TODO: wtf как поравнять и в строках и в столбцах
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
-            if (i != j && (matrix[i][i] <= matrix[i][j] || matrix[j][j] <= matrix[i][j])) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
+//bool check_max_diag(const int n, const vvd &matrix)  {// TODO: как поравнять и в строках и в столбцах
+//    for (int i = 0; i < n; ++i) {
+//        int summ = 0;
+//
+//        for (int j = 0; j < n; ++j) {
+//            summ += matrix[i][j];
+//        }
+//        if (matrix[i][i] <= summ) {
+//            return false;
+//        }
+//    }
+//    return true;
+//}
 
 enum {
     SUCCESS,
@@ -161,9 +165,10 @@ int inverseMatrix(const int n, const vvd &matrixA, vvd &Ansv) {
             return code;
         }
         for (int j = 0; j < n; ++j) {
-            Ansv[j][i] = b[j];
+            Ansv[j][i] =x[j];
         }
     }
+    return SUCCESS;
 }
 
 int DetLU(const int n, const vvd &matrixA) {
@@ -182,6 +187,11 @@ int main() {
     double elem;
     std::cout << "Input number of variables:\n";
     std::cin >> n;
+
+//    vvd matrixA = {{10, 1, 1},
+//                   {2, 10, 1},
+//                   {2, 2, 10}};
+//    vd b = {12, 13, 14};
 
     vvd matrixA = {{-4, -9, 4, 3},
                    {2, 7, 9, 8},
@@ -205,11 +215,8 @@ int main() {
 //        b[i] = elem;
 //    }
 
-    if (matrixA[0][0] == 0) {
+    if (fabs(matrixA[0][0]) <= 0.0000000001) {
         return INVALID_MATRIX;
-    }
-    if (matrixDet(n, matrixA) == 0) {
-        return ZERO_DET;
     }
     vd X(n);
     vvd L(n, vd(n));
@@ -223,4 +230,16 @@ int main() {
     for (int i = 0; i < n; ++i) {
         std::cout << X[i] << "\n";
     }
+    std::cout << "Invers matrix: \n";
+    vvd Inv(n, vd(n));
+    inverseMatrix(n, matrixA, Inv);
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            std::cout << Inv[i][j] << ' ';
+        }
+        std::cout << '\n';
+    }
+
+    double determenant = DetLU(n, matrixA);
+    std::cout << "Determenant: " << determenant << '\n';
 }
