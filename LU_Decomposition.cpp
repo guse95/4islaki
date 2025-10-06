@@ -129,7 +129,7 @@ void splitLU(const int n, const vvd &matrix, vvd &L, vvd &U) {
     }
 }
 
-int solve(const int n, const vvd &L, const vvd &U, const vd &b, vd &x) {
+void solve(const int n, const vvd &L, const vvd &U, const vd &b, vd &x) {
     //Lz = b
     vd z(n);
     z[0] = b[0];
@@ -149,7 +149,6 @@ int solve(const int n, const vvd &L, const vvd &U, const vd &b, vd &x) {
         }
         x[i] /= U[i][i];
     }
-    return SUCCESS;
 }
 
 int inverseMatrix(const int n, const vvd &matrixA, vvd &Ansv) {
@@ -160,10 +159,8 @@ int inverseMatrix(const int n, const vvd &matrixA, vvd &Ansv) {
         vd b(n);
         vd x(n);
         b[i] = 1;
-        int code;
-        if ((code = solve(n, L, U, b, x)) != SUCCESS) {
-            return code;
-        }
+        solve(n, L, U, b, x);
+
         for (int j = 0; j < n; ++j) {
             Ansv[j][i] =x[j];
         }
@@ -184,7 +181,6 @@ double DetLU(const int n, const vvd &matrixA) {
 
 int main() {
     int n;
-    double elem;
     std::cout << "Input number of variables:\n";
     std::cin >> n;
 
@@ -213,16 +209,6 @@ int main() {
                    {0, 0, 0, 4, 5}};
     const vd b = {-66, -47, -43, -74, 14};
 
-    //    std::cout << "Input matrix:\n";
-//    for (int i = 0; i < n; ++i) {
-//        for (int j = 0; j < n; ++j) {
-//            std::cin >> elem;
-//            matrixA[i][j] = elem;
-//        }
-//        std::cin >> elem;
-//        b[i] = elem;
-//    }
-
     if (fabs(matrixA[0][0]) <= 0.0000000001) {
         return INVALID_MATRIX;
     }
@@ -234,10 +220,7 @@ int main() {
     std::cout << "Matrix L:\n" << L << "\n\nMatrix U:\n" << U;
     std::cout << "\n\nL * U:\n" << L * U << "\n";
 
-    if (int code; (code = solve(n, L, U, b, X)) != SUCCESS) {
-        ValidateCode(code);
-        return code;
-    }
+    solve(n, L, U, b, X);
 
     std::cout << "\nAnswers:\n";
     for (int i = 0; i < n; ++i) {
@@ -247,12 +230,7 @@ int main() {
     std::cout << "\nInvers matrix: \n";
     vvd Inv(n, n);
     inverseMatrix(n, matrixA, Inv);
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
-            std::cout << Inv[i][j] << ' ';
-        }
-        std::cout << '\n';
-    }
+    std::cout << Inv << '\n';
 
     double determenant = DetLU(n, matrixA);
     std::cout << "\nDetermenant: " << determenant << '\n';

@@ -225,7 +225,7 @@ matrix<T> matrix<T>::operator*(const matrix &other) const {
 
 template<class T>
 std::vector<T> matrix<T>::operator*(const std::vector<T> &other) const {
-    if (cols != other.rows) {
+    if (cols != other.size()) {
         throw std::invalid_argument("matrix size mismatch in *=");
     }
     std::vector<T> tmp(rows);
