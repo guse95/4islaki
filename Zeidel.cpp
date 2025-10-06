@@ -1,5 +1,5 @@
 #include "src/Matrix.h"
-#define DEBUG;
+// #define DEBUG;
 
 using vd = std::vector<double>;
 
@@ -74,7 +74,7 @@ void simple_integrations(const matrix<double>& matrixA, const vd& b, const doubl
     }
     std::cout << "Answer:\n";
     for (int i = 0; i < n; i++) {
-        std::cout << X_cur[i] << '\n';
+        std::cout << std::fixed << std::setprecision(2) << X_cur[i] << '\n';
     }
     std::cout << "Number of iterations: " << k << '\n';
 }
@@ -184,7 +184,7 @@ int main() {
     };
     const vd b = {127, -144, 236, -5};
 
-    // simple_integrations(matrixA, b, eps);
+    simple_integrations(matrixA, b, eps);
 
     Zeidel(matrixA, b, eps);
 }
