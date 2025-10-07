@@ -4,23 +4,11 @@
 #include <vector>
 #include "src/Matrix.h"
 
+//#define Z
+
 using vvd = matrix<double>;
 using vd = std::vector<double>;
 
-
-//bool check_max_diag(const int n, const vvd &matrix)  {// TODO: как поравнять и в строках и в столбцах
-//    for (int i = 0; i < n; ++i) {
-//        int summ = 0;
-//
-//        for (int j = 0; j < n; ++j) {
-//            summ += matrix[i][j];
-//        }
-//        if (matrix[i][i] <= summ) {
-//            return false;
-//        }
-//    }
-//    return true;
-//}
 
 enum {
     SUCCESS,
@@ -30,29 +18,44 @@ enum {
     ERROR
 };
 
-void ValidateCode(const int code) {
-    switch (code) {
-        case SUCCESS:
-            printf("SUCCESS\n");
-        return;
-        case ERROR:
-            printf("ERROR\n");
-        return;
-        case INVALID_MATRIX:
-            printf("First element cant be zero.\n");
-        return;
-        case NO_DIAG_DOMINATION:
-            printf("There is no diagonal domination.\n");
-        return;
-        case ZERO_DET:
-            printf("There is no single solution.\n");
-        return;
-        default:
-            printf("why are u here?\n");
-        return;
-    }
-}
+#ifdef Z
+const std::string COLORS[] = {
+    "\033[97m", // Красный
+    "\033[97m", // Желтый
+    "\033[97m", // Желтый
+    "\033[97m", // Желтый
+    "\033[94m", // Зеленый
+    "\033[94m", // Голубой
+    "\033[94m", // Голубой
+    "\033[94m", // Голубой
+    "\033[91m", // Синий
+    "\033[91m", // Синий
+    "\033[91m"  // Фиолетовый
+};
+const std::string RESET = "\033[0m";
 
+void printColoredZ() {
+    std::vector<std::string> z_detailed = {
+        "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓",
+        "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  ",
+        "░░░░░░░░░░░░▓▓▓▓  ",
+        "░░░░░░░░░░▓▓▓▓░░  ",
+        "░░░░░░░░▓▓▓▓░░░░  ",
+        "░░░░░░▓▓▓▓░░░░░░  ",
+        "░░░░▓▓▓▓░░░░░░░░  ",
+        "░░▓▓▓▓░░░░░░░░░░  ",
+        "▓▓▓▓░░░░░░░░░░░░  ",
+        "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  ",
+        "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  "
+    };
+
+    std::cout << "\n";
+    for (size_t i = 0; i < z_detailed.size(); i++) {
+        std::cout << COLORS[i % 11] << z_detailed[i] << RESET << std::endl;
+    }
+    std::cout << "\n";
+}
+#endif
 // double matrixDet(const int n, const vvd &matrix) { //в тупую
 //     switch (n) {
 //         case 1:
@@ -94,20 +97,6 @@ void splitLU(const int n, const vvd &matrix, vvd &L, vvd &U) {
     for (int k = 1; k < n; ++k) {
         L[k][0] = matrix[k][0] / U[0][0];
     }
-
-    //первые 3 строчки и столбца по отдельности
-    // for (int k = 2; k < n; ++k) {
-    //     U[2][k] = matrix[2][k] - L[2][1] * U[1][k];
-    // }
-    // for (int k = 3; k < n; ++k) {
-    //     L[k][2] = (matrix[k][2] - L[k][1] * U[1][2]) / U[2][2];
-    // }
-    // for (int k = 3; k < n; ++k) {
-    //     U[3i][k] = matrix[3i][k] - L[3i][1] * U[1][k] - L[3i][2] * U[2][k];
-    // }
-    // for (int k = 4; k < n; ++k) {
-    //     L[k][3i] = (matrix[k][3i] - L[k][1] * U[1][3i] - L[k][2] * U[2][3i]) / U[3][3];
-    // }
 
     //все елементы кроме 1 строчки и столбца в общем виде
     for (int i = 1; i < n; ++i){
@@ -180,20 +169,23 @@ double DetLU(const int n, const vvd &matrixA) {
 }
 
 int main() {
+#ifdef Z
+    printColoredZ();
+#endif
     int n;
     std::cout << "Input number of variables:\n";
     std::cin >> n;
 
-    // vvd matrixA = {{10, 1, 1},
-    //                {2, 10, 1},
-    //                {2, 2, 10}};
-    // vd b = {12, 13, 14};
+//     vvd matrixA = {{10, 1, 1},
+//                    {2, 10, 1},
+//                    {2, 2, 10}};
+//     vd b = {12, 13, 14};
 
-    // vvd matrixA = {{-4, -9, 4, 3},
-    //                {2, 7, 9, 8},
-    //                {4, -4, 0, -2},
-    //                {-8, 5, 2, 9}};
-    // vd b = {-52, 76, 26, -73};
+     vvd matrixA = {{-4, -9, 4, 3},
+                    {2, 7, 9, 8},
+                    {4, -4, 0, -2},
+                    {-8, 5, 2, 9}};
+     vd b = {-52, 76, 26, -73};
 
     // vvd matrixA = {{-11, -8, 0, 0, 0},
     //                {9, -17, 1, 0, 0, 0},
@@ -202,12 +194,12 @@ int main() {
     //                {0, 0, 0, -6, 14}};
     // vd b = {99, -75, 66, 54, 8};
 
-    vvd matrixA = {{13, -5, 0, 0, 0},
-                   {-4, 9, -5, 0, 0},
-                   {0, -1, 12, -6, 0},
-                   {0, 0, 6, 20, -5},
-                   {0, 0, 0, 4, 5}};
-    const vd b = {-66, -47, -43, -74, 14};
+//    vvd matrixA = {{13, -5, 0, 0, 0},
+//                   {-4, 9, -5, 0, 0},
+//                   {0, -1, 12, -6, 0},
+//                   {0, 0, 6, 20, -5},
+//                   {0, 0, 0, 4, 5}};
+//    const vd b = {-66, -47, -43, -74, 14};
 
     if (fabs(matrixA[0][0]) <= 0.0000000001) {
         return INVALID_MATRIX;
@@ -231,6 +223,8 @@ int main() {
     vvd Inv(n, n);
     inverseMatrix(n, matrixA, Inv);
     std::cout << Inv << '\n';
+
+    std::cout << "Check Invers:\n" << matrixA * Inv << "\n\n";
 
     double determenant = DetLU(n, matrixA);
     std::cout << "\nDetermenant: " << determenant << '\n';

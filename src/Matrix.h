@@ -377,7 +377,12 @@ template<class T>
 std::ostream& operator<<(std::ostream& os, const matrix<T>& matrix) {
     for (size_t i = 0; i < matrix.getRows(); i++) {
         for (size_t j = 0; j < matrix.getCols(); j++) {
-            os << std::fixed << std::setprecision(2) << matrix[i][j];
+            if (fabs(matrix[i][j]) < 0.00001) {
+                os << std::fixed << std::setprecision(2) << 0.0;
+            } else {
+                os << std::fixed << std::setprecision(2) << matrix[i][j];
+            }
+
             if (j < matrix.getCols() - 1) {
                 os << " ";
             }

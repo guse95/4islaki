@@ -1,5 +1,5 @@
 #include "src/Matrix.h"
-// #define DEBUG;
+ #define DEBUG;
 
 using vd = std::vector<double>;
 
