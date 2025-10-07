@@ -10,3 +10,5 @@ add_executable(LU LU_Decomposition.cpp)
 add_executable(run_throw run_throw.cpp)
 
 add_executable(Zeidel Zeidel.cpp)
+
+add_executable(QR QR_Decomposition.cpp)

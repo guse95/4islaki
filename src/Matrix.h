@@ -34,6 +34,7 @@ public:
     matrix& operator+=(const matrix& other);
     matrix& operator-=(const matrix& other);
     matrix& operator*=(const T& other);
+    matrix& operator/=(const T& other);
     matrix& operator*=(const matrix& other);
 
     matrix operator*(const matrix& other) const;
@@ -41,12 +42,14 @@ public:
     matrix operator+(const matrix& other) const;
     matrix operator-(const matrix& other) const;
     matrix operator*(const T& other) const;
+    matrix operator/(const T& other) const;
 
     T& operator()(size_t row, size_t col);
     RowProxy operator[](size_t row);
     ConstRowProxy operator[](size_t row) const;
     bool operator==(const matrix& other);
 
+    static matrix<T> setE(const int& n);
     matrix transpose() const;
     matrix& resize(size_t new_rows, size_t new_cols);
 
@@ -92,7 +95,7 @@ template<class T>
 matrix<T>::matrix(const matrix &other) : data(other.data), rows(other.rows), cols(other.cols) {}
 
 template<class T>
-matrix<T>::~matrix() {}
+matrix<T>::~matrix() = default;
 
 template<class T>
 matrix<T>::RowProxy::RowProxy (std::vector<T>& r) : row(r) {}
@@ -206,6 +209,16 @@ matrix<T>& matrix<T>::operator*=(const T &other) {
 }
 
 template<class T>
+matrix<T>& matrix<T>::operator/=(const T &other) {
+    for (size_t i = 0; i < rows; i++) {
+        for (size_t j = 0; j < cols; j++) {
+            data[i][j] /= other;
+        }
+    }
+    return *this;
+}
+
+template<class T>
 matrix<T> matrix<T>::operator*(const matrix &other) const {
     if (cols != other.rows) {
         throw std::invalid_argument("matrix size mismatch in *=");
@@ -267,6 +280,13 @@ matrix<T> matrix<T>::operator*(const T &other) const {
 }
 
 template<class T>
+matrix<T> matrix<T>::operator/(const T &other) const {
+    matrix tmp(*this);
+    tmp *= other;
+    return tmp;
+}
+
+template<class T>
 T& matrix<T>::operator()(size_t row, size_t col) {
     if (row >= rows || col >= cols) {
         throw std::invalid_argument("matrix size mismatch in ()");
@@ -305,13 +325,22 @@ typename matrix<T>::ConstRowProxy matrix<T>::operator[](size_t row) const {
 }
 
 template<class T>
-matrix<T> matrix<T>::transpose() const {
-    if (cols != rows) {
-        throw std::invalid_argument("matrix size mismatch in transpose()");
+matrix<T> matrix<T>::setE(const int& n) {
+    matrix<T> tmp(n);
+    for (int i = 0; i < n; i++) {
+        tmp[i][i] = 1;
     }
-    matrix tmp(rows, cols);
-    for (size_t i = 0; i < rows; i++) {
-        for (size_t j = 0; j < cols; j++) {
+    return tmp;
+}
+
+template<class T>
+matrix<T> matrix<T>::transpose() const {
+//    if (cols != rows) {
+//        throw std::invalid_argument("matrix size mismatch in transpose()");
+//    }
+    matrix tmp(cols, rows);
+    for (size_t i = 0; i < cols; i++) {
+        for (size_t j = 0; j < rows; j++) {
             tmp.data[i][j] = data[j][i];
         }
     }
@@ -348,7 +377,7 @@ template<class T>
 std::ostream& operator<<(std::ostream& os, const matrix<T>& matrix) {
     for (size_t i = 0; i < matrix.getRows(); i++) {
         for (size_t j = 0; j < matrix.getCols(); j++) {
-            os << matrix[i][j];
+            os << std::fixed << std::setprecision(2) << matrix[i][j];
             if (j < matrix.getCols() - 1) {
                 os << " ";
             }
