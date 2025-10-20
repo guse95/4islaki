@@ -11,4 +11,8 @@ add_executable(run_throw run_throw.cpp)
 
 add_executable(Zeidel Zeidel.cpp)
 
+add_executable(Newton_solo Newton_solo.cpp)
+
+add_executable(Newton_mult Newtom_multiplay.cpp)
+
 add_executable(QR QR_Decomposition.cpp)

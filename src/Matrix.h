@@ -51,6 +51,7 @@ public:
 
     static matrix<T> setE(const int& n);
     matrix transpose() const;
+    matrix inverse() const;
     matrix& resize(size_t new_rows, size_t new_cols);
 
     size_t getRows() const;
@@ -344,6 +345,25 @@ matrix<T> matrix<T>::transpose() const {
             tmp.data[i][j] = data[j][i];
         }
     }
+    return tmp;
+}
+
+template<class T>
+matrix<T> matrix<T>::inverse() const {
+    if (cols != rows) {
+        throw std::invalid_argument("matrix size mismatch in ()");
+    }
+    if (cols != 2) {
+        throw std::invalid_argument("so difficult for invers method");
+    }
+    matrix tmp(cols, cols);
+
+    double det = data[0][0] * data[1][1] - data[0][1] * data[1][0];
+    tmp.data[0][0] = data[1][1] / det;
+    tmp.data[0][1] = -data[0][1] / det;
+    tmp.data[1][0] = -data[1][0] / det;
+    tmp.data[1][1] = data[0][0] / det;
+
     return tmp;
 }
 
