@@ -1,1 +1,2 @@
 add_executable(Lagrange_Newton Lagrange_Newton.cpp)
+add_executable(Cubic_spline Cubic_Spline.cpp)
