@@ -5,6 +5,7 @@
 #include "src/Matrix.h"
 
 //#define Z
+// #define LU
 
 using vvd = matrix<double>;
 using vd = std::vector<double>;
@@ -167,7 +168,7 @@ double DetLU(const int n, const vvd &matrixA) {
     }
     return det;
 }
-
+#ifdef LU
 int main() {
 #ifdef Z
     printColoredZ();
@@ -229,3 +230,4 @@ int main() {
     double determenant = DetLU(n, matrixA);
     std::cout << "\nDetermenant: " << determenant << '\n';
 }
+#endif
