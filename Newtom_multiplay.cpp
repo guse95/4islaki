@@ -41,20 +41,29 @@ matrix<double> x_next_Newton(matrix<double> &x){
 }
 
 void method_iter(matrix<double> (*x_next)(matrix<double>& ), double (*norm)(matrix<double>& ),double eps = 0.00001, int max_iter = 1000){
-    //matrix<double> x_prev(mx{{3.75}, {2.0}}), x(mx{{3.75}, {2.0}});
     matrix<double> x_prev(2, 1);
-    x_prev(0,0) = 3.75;
-    x_prev(1,0) = 2;
+    x_prev(0,0) = 2.5;
+    x_prev(1,0) = 1.5;
 
     matrix<double> x = x_prev;
 
-    if (fabs(norm(x_prev)) >= 1.0){
+    double q_l = fabs(norm(x));
+    double q_r = fabs(norm(x_prev));
+    double q;
+    if (q_l > q_r) {
+        q = q_l;
+        x_prev = x;
+    } else {
+        q = q_r;
+    }
+
+    if (q >= 1.0){
         throw std::invalid_argument("The convergence condition is not satisfied norm = " + std::to_string(norm(x_prev)));
     }
     for (int i = 1; i <= max_iter; i++){
         x = x_next(x);
         matrix<double> diff = x - x_prev;
-        if (std::max(fabs((diff(0, 0))), fabs(diff(1, 0))) < eps){
+        if (std::max(fabs((diff(0, 0))), fabs(diff(1, 0))) * q / (1- q) < eps){
             std::cout << "Iteration method:" << "\n";
             std::cout << "X:\n" << x << "\n";
             std::cout << "Number of iterations: " << i << "\n";
@@ -66,11 +75,10 @@ void method_iter(matrix<double> (*x_next)(matrix<double>& ), double (*norm)(matr
 }
 
 void method_Newton(matrix<double> (*x_next)(matrix<double>& ), double eps = 0.00001, int max_iter = 1000){
-    //matrix<double> x_prev(mx{{3.75}, {2.0}}), x(mx{{3.75}, {2.0}});
 
     matrix<double> x_prev(2, 1);
-    x_prev(0,0) = 3.75;
-    x_prev(1,0) = 2;
+    x_prev(0,0) = 2.5;
+    x_prev(1,0) = 1.5;
 
     matrix<double> x = x_prev;
 
