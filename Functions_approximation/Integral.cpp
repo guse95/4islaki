@@ -6,7 +6,8 @@ using vd = std::vector<double>;
 
 
 double f(const double x) {
-    return x / ((3 * x + 4) * (3 * x + 4));
+    // return x / ((3 * x + 4) * (3 * x + 4));
+    return 1 / (x * x + 4);
 }
 
 double rectangles(const double l, const double r, const double h) {
@@ -54,10 +55,15 @@ double Simpson(const double l, const double r, const double h) {
 }
 
 int main() {
-    constexpr double x0 = -1;
-    constexpr double x1 = 1;
-    constexpr double h1 = 0.5;
-    constexpr double h2 = 0.25;
+    // constexpr double x0 = -1;
+    // constexpr double x1 = 1;
+    // constexpr double h1 = 0.5;
+    // constexpr double h2 = 0.25;
+
+    constexpr double x0 = -2;
+    constexpr double x1 = 2;
+    constexpr double h1 = 1;
+    constexpr double h2 = 0.5;
 
     double F_rec_1 = rectangles(x0, x1, h1);
     double F_trap_1 = trapezoids(x0, x1, h1);

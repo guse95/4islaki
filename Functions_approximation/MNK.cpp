@@ -82,13 +82,20 @@ double second_sum_of_squares_errors(const vd& x, const vd& y) {
 }
 
 int main() {
-    vd x = {0, 1.7, 3.4, 5.1, 6.8, 8.5};
-    vd y = {0, 1.3038, 1.8439, 2.2583, 2.6077, 2.9155};
+    // vd x = {0, 1.7, 3.4, 5.1, 6.8, 8.5}; // example
+    // vd y = {0, 1.3038, 1.8439, 2.2583, 2.6077, 2.9155};
 
+    vd x = {-0.7, -0.4, -0.1, 0.2, 0.5, 0.8};
+    vd y = {-0.7754, -0.41152, -0.10017, 0.20136, 0.5236, 0.9273};
+
+    std::cout << std::fixed << std::setprecision(5);
     const vd A = sub_first_approximation(x, y);
     std::cout << "First approximation:\nx   F1" << std::endl;
     for (const double i : x) {
         std:: cout << i << "  " << first_approximation(i, A) << '\n';
+    }
+    for (int i = 0; i < A.size(); ++i) {
+        std::cout << 'a' << i << " = " << A[i] << '\n';
     }
     std::cout << "First sum of squares errors: " << first_sum_of_squares_errors(x, y) << '\n';
 
@@ -96,6 +103,9 @@ int main() {
     std::cout << "First approximation:\nx   F2" << std::endl;
     for (const double i : x) {
         std:: cout << i << "  " << second_approximation(i, B) << '\n';
+    }
+    for (int i = 0; i < B.size(); ++i) {
+        std::cout << 'a' << i << " = " << B[i] << '\n';
     }
     std::cout << "Second sum of squares errors: " << second_sum_of_squares_errors(x, y) << '\n';
 }

@@ -99,7 +99,7 @@ void calculateSplineCoefficients(const int n, const vd& x, const vd& y, vd& a, v
     }
 }
 
-double evaluate(const int n, const double x, vd& xi, vd& a, vd& c, vd& b, vd& d) {
+std::pair<double, int> evaluate(const int n, const double x, const vd& xi, const vd& a, const vd& c, const vd& b, const vd& d) {
     // Находим интервал, которому принадлежит x
     int segment = 0;
     for (int i = 0; i <= n; i++) {
@@ -111,7 +111,7 @@ double evaluate(const int n, const double x, vd& xi, vd& a, vd& c, vd& b, vd& d)
     if (segment > n) segment = n;
 
     double dx = x - xi[segment];
-    return a[segment] + b[segment] * dx + c[segment] * dx * dx + d[segment] * dx * dx * dx;
+    return {a[segment] + b[segment] * dx + c[segment] * dx * dx + d[segment] * dx * dx * dx, segment};
 }
 
 int main() {
@@ -121,11 +121,19 @@ int main() {
     vd c(n);
     vd d(n);
 
-    double x0 = 1.5;
-    vd x = {0, 1, 2, 3, 4};
-    vd y = {0, 1.8415, 2.9093, 3.1411, 3.2432};
+    // double x0 = 1.5; // example
+    // vd x = {0, 1, 2, 3, 4};
+    // vd y = {0, 1.8415, 2.9093, 3.1411, 3.2432};
+
+    const double x0 = 0.1;
+    const vd x = {-0.4, -0.1, 0.2, 0.5, 0.8};
+    const vd y = {-0.41152, -0.10017, 0.20136, 0.52360, 0.92730};
 
     calculateSplineCoefficients(n, x, y, a, b, c, d);
     auto res = evaluate(n, x0, x, a, c, b, d);
-    std::cout << "Function result in x0: " << res << std::endl;
+
+    std::cout << "x0 is in [" << x[res.second] << ", " << x[res.second + 1] << "]" << std::endl;
+    std::cout << "Coefficients:\na         b        c         d\n" <<
+        a[res.second] << ' ' << b[res.second] << ' ' << c[res.second] << ' ' << d[res.second] << std::endl;
+    std::cout << "Function result in x0: " << res.first << std::endl;
 }
