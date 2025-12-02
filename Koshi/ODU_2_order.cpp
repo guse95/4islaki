@@ -15,18 +15,17 @@ struct Solution {
 struct EulerCauchySolution {
     vector<double> x;
     vector<double> y;
-    vector<double> y_pred;  // прогнозные значения
-    vector<double> delta_y; // приращения
+    vector<double> y_pred;
+    vector<double> delta_y;
 };
 
 struct ImprovedEulerSolution {
     vector<double> x;
     vector<double> y;
-    vector<double> y_half;  // значения в средней точке
-    vector<double> delta_y; // приращения
+    vector<double> y_half;
+    vector<double> delta_y;
 };
 
-// Точное решение: y = (e^(x²) + e^(-x²) - 1)e^(x²)
 double exact_solution(double x) {
     double x_squared = x * x;
     double exp_x2 = exp(x_squared);
@@ -34,9 +33,6 @@ double exact_solution(double x) {
     return (exp_x2 + exp_minus_x2 - 1) * exp_x2;
 }
 
-// Правая часть уравнения: y" = A*x*y' - (4x² - 3)*y + e^(x²)
-// Уравнение: y" - A*x*y' + (4x² - 3)y = e^(x²)
-// Где A = 2 (вероятно, из контекста)
 double f(double x, double y, double z) {
     // Здесь z = y'
     double A = 2.0; // Из уравнения видно A=2
@@ -44,12 +40,6 @@ double f(double x, double y, double z) {
     return A * x * z - (4 * x_squared - 3) * y + exp(x_squared);
 }
 
-// Для методов Эйлера, Эйлера-Коши и улучшенного Эйлера нужно f(x, y)
-// Преобразуем уравнение второго порядка к системе первого порядка
-// y' = z
-// z' = f(x, y, z)
-
-// ================== МЕТОД ЭЙЛЕРА (явный) ДЛЯ СИСТЕМЫ ==================
 Solution euler_method_system(double x0, double y0, double z0, double h, int n) {
     Solution sol;
     sol.x.resize(n + 1);
@@ -73,7 +63,6 @@ Solution euler_method_system(double x0, double y0, double z0, double h, int n) {
     return sol;
 }
 
-// ================== МЕТОД ЭЙЛЕРА-КОШИ ДЛЯ СИСТЕМЫ ==================
 EulerCauchySolution euler_cauchy_method_system(double x0, double y0, double z0, double h, int n) {
     EulerCauchySolution sol;
     sol.x.resize(n + 1);
@@ -81,7 +70,6 @@ EulerCauchySolution euler_cauchy_method_system(double x0, double y0, double z0, 
     sol.y_pred.resize(n + 1);
     sol.delta_y.resize(n + 1);
 
-    // Для системы храним также производные
     vector<double> z(n + 1);
     vector<double> z_pred(n + 1);
 
@@ -94,14 +82,12 @@ EulerCauchySolution euler_cauchy_method_system(double x0, double y0, double z0, 
         double yk = sol.y[k];
         double zk = z[k];
 
-        // Прогноз (этап 1) - метод Эйлера
         double y_pred = yk + h * zk;
         double z_pred_val = zk + h * f(xk, yk, zk);
 
         sol.y_pred[k + 1] = y_pred;
         z_pred[k + 1] = z_pred_val;
 
-        // Коррекция (этап 2) - усреднение
         double x_next = xk + h;
         double y_next = yk + 0.5 * h * (zk + z_pred_val);
         double z_next = zk + 0.5 * h * (f(xk, yk, zk) + f(x_next, y_pred, z_pred_val));
@@ -115,7 +101,6 @@ EulerCauchySolution euler_cauchy_method_system(double x0, double y0, double z0, 
     return sol;
 }
 
-// ================== ПЕРВЫЙ УЛУЧШЕННЫЙ МЕТОД ЭЙЛЕРА ДЛЯ СИСТЕМЫ ==================
 ImprovedEulerSolution improved_euler_method_system(double x0, double y0, double z0, double h, int n) {
     ImprovedEulerSolution sol;
     sol.x.resize(n + 1);
@@ -123,7 +108,6 @@ ImprovedEulerSolution improved_euler_method_system(double x0, double y0, double 
     sol.y_half.resize(n + 1);
     sol.delta_y.resize(n + 1);
 
-    // Для системы храним также производные
     vector<double> z(n + 1);
     vector<double> z_half(n + 1);
 
@@ -136,12 +120,10 @@ ImprovedEulerSolution improved_euler_method_system(double x0, double y0, double 
         double yk = sol.y[k];
         double zk = z[k];
 
-        // Шаг на половинном интервале
         double x_half = xk + h/2;
         double y_half = yk + (h/2) * zk;
         double z_half_val = zk + (h/2) * f(xk, yk, zk);
 
-        // Полный шаг с использованием производных в средней точке
         double y_next = yk + h * z_half_val;
         double z_next = zk + h * f(x_half, y_half, z_half_val);
 
@@ -155,12 +137,11 @@ ImprovedEulerSolution improved_euler_method_system(double x0, double y0, double 
     return sol;
 }
 
-// ================== МЕТОД РУНГЕ-КУТТЫ 4-го порядка ДЛЯ СИСТЕМЫ ==================
 Solution runge_kutta_4_method_system(double x0, double y0, double z0, double h, int n) {
     Solution sol;
     sol.x.resize(n + 1);
     sol.y.resize(n + 1);
-    sol.dy.resize(n + 1); // здесь храним z = y'
+    sol.dy.resize(n + 1);
 
     sol.x[0] = x0;
     sol.y[0] = y0;
@@ -191,7 +172,6 @@ Solution runge_kutta_4_method_system(double x0, double y0, double z0, double h, 
     return sol;
 }
 
-// ================== МЕТОД АДАМСА 4-го порядка ДЛЯ СИСТЕМЫ ==================
 Solution adams_4_method_system(double x0, double y0, double z0, double h, int n) {
     Solution sol;
     sol.x.resize(n + 1);
@@ -199,7 +179,6 @@ Solution adams_4_method_system(double x0, double y0, double z0, double h, int n)
     sol.dy.resize(n + 1); // здесь храним z = y' и f(x,y,z)
     vector<double> f_vals(n + 1); // храним f(x,y,z)
 
-    // Запускаем метод Рунге-Кутты для получения первых 4 точек
     Solution rk_start = runge_kutta_4_method_system(x0, y0, z0, h, 3);
 
     for (int i = 0; i < 4; i++) {
@@ -209,33 +188,27 @@ Solution adams_4_method_system(double x0, double y0, double z0, double h, int n)
         f_vals[i] = f(sol.x[i], sol.y[i], sol.dy[i]);
     }
 
-    // Продолжаем методом Адамса, начиная с 4-й точки
     for (int k = 3; k < n; k++) {
         sol.x[k + 1] = sol.x[k] + h;
 
-        // Формула Адамса для y
         sol.y[k + 1] = sol.y[k] + h/24.0 * (55*sol.dy[k] - 59*sol.dy[k-1]
                                           + 37*sol.dy[k-2] - 9*sol.dy[k-3]);
 
-        // Сначала используем прогноз для z
         double z_pred = sol.dy[k] + h/24.0 * (55*f_vals[k] - 59*f_vals[k-1]
                                            + 37*f_vals[k-2] - 9*f_vals[k-3]);
 
-        // Затем вычисляем f в новой точке
         f_vals[k + 1] = f(sol.x[k + 1], sol.y[k + 1], z_pred);
 
-        // Коррекция для z
         sol.dy[k + 1] = sol.dy[k] + h/24.0 * (55*f_vals[k] - 59*f_vals[k-1]
                                            + 37*f_vals[k-2] - 9*f_vals[k-3]);
 
-        // Уточняем f с новым значением z
         f_vals[k + 1] = f(sol.x[k + 1], sol.y[k + 1], sol.dy[k + 1]);
     }
 
     return sol;
 }
 
-// ================== ВЫВОД ТАБЛИЦ ==================
+
 void print_simple_table(const Solution& sol, const string& method_name) {
     cout << "\nTable by method of " << method_name << "\n";
     cout << "==============================================================\n";
@@ -260,7 +233,7 @@ void print_euler_cauchy_table(const EulerCauchySolution& sol, const string& meth
     cout << "\nTable by method of " << method_name << "\n";
     cout << "============================================================================================\n";
     cout << setw(5) << "k" << setw(12) << "x_k" << setw(15) << "y_k"
-         << setw(15) << "y_pred" << setw(15) << "Δy_k"
+         << setw(15) << "y_pred" << setw(15) << "delta_y_k"
          << setw(15) << "y_actual" << setw(15) << "error" << endl;
     cout << "============================================================================================\n";
 
@@ -290,7 +263,7 @@ void print_improved_euler_table(const ImprovedEulerSolution& sol, const string& 
     cout << "\nTable by method of " << method_name << "\n";
     cout << "============================================================================================\n";
     cout << setw(5) << "k" << setw(12) << "x_k" << setw(15) << "y_k"
-         << setw(15) << "y_{k+1/2}" << setw(15) << "Δy_k"
+         << setw(15) << "y_{k+1/2}" << setw(15) << "delta_y_k"
          << setw(15) << "y_actual" << setw(15) << "error" << endl;
     cout << "============================================================================================\n";
 
@@ -316,78 +289,66 @@ void print_improved_euler_table(const ImprovedEulerSolution& sol, const string& 
     cout << "============================================================================================\n";
 }
 
-// ================== ОЦЕНКА ПОГРЕШНОСТИ ==================
 double runge_romberg_error(double y_h, double y_2h, int p) {
     return abs(y_h - y_2h) / (pow(2, p) - 1);
 }
 
-// ================== ОСНОВНАЯ ПРОГРАММА ==================
 int main() {
-    // Параметры задачи из фото
+
     double x0 = 0.0;
     double y0 = 1.0;       // y(0) = 1
     double z0 = 0.0;       // y'(0) = 0
     double b = 1.0;        // x ∈ [0, 1]
-    double h = 0.1;        // шаг
+    double h = 0.1;
     int n = (int)((b - x0) / h);
 
     cout << "==============================================\n";
     cout << "   SOLUTION OF CAUCHY PROBLEM\n";
-    cout << "   y'' - 2xy' + (4x² - 3)y = e^(x²)\n";
+    cout << "   y'' - 2xy' + (4x^2 - 3)y = e^(x^2)\n";
     cout << "   y(0) = 1, y'(0) = 0\n";
     cout << "   on interval [0, 1.0]\n";
     cout << "   step h = " << h << "\n";
-    cout << "   Exact solution: y(x) = (e^(x²) + e^(-x²) - 1)e^(x²)\n";
+    cout << "   Exact solution: y(x) = (e^(x^2) + e^(-x^2) - 1)e^(x^2)\n";
     cout << "==============================================\n";
 
-    // 1. Метод Эйлера (явный) для системы
     cout << "\n1. EXPLICIT EULER METHOD FOR SYSTEM\n";
     Solution sol_euler = euler_method_system(x0, y0, z0, h, n);
     print_simple_table(sol_euler, "explicit Euler");
 
-    // 2. Метод Эйлера-Коши для системы
     cout << "\n2. EULER-CAUCHY METHOD FOR SYSTEM\n";
     EulerCauchySolution sol_euler_cauchy = euler_cauchy_method_system(x0, y0, z0, h, n);
     print_euler_cauchy_table(sol_euler_cauchy, "Euler-Cauchy");
 
-    // 3. Первый улучшенный метод Эйлера для системы
     cout << "\n3. FIRST IMPROVED EULER METHOD FOR SYSTEM\n";
     ImprovedEulerSolution sol_improved_euler = improved_euler_method_system(x0, y0, z0, h, n);
     print_improved_euler_table(sol_improved_euler, "first improved Euler");
 
-    // 4. Метод Рунге-Кутты 4-го порядка для системы
     cout << "\n4. RUNGE-KUTTA 4th ORDER METHOD FOR SYSTEM\n";
     Solution sol_rk4 = runge_kutta_4_method_system(x0, y0, z0, h, n);
     print_simple_table(sol_rk4, "Runge-Kutta 4th order");
 
-    // 5. Метод Адамса 4-го порядка для системы
     cout << "\n5. ADAMS 4th ORDER METHOD FOR SYSTEM\n";
     Solution sol_adams = adams_4_method_system(x0, y0, z0, h, n);
     print_simple_table(sol_adams, "Adams 4th order");
 
-    // ================== ОЦЕНКА ПОГРЕШНОСТИ ==================
     cout << "\n6. ERROR ESTIMATION\n";
     cout << "==============================================\n";
 
     double h2 = h * 2;
     int n2 = (int)((b - x0) / h2);
 
-    // Для метода Эйлера
     Solution sol_euler_h = euler_method_system(x0, y0, z0, h, n);
     Solution sol_euler_2h = euler_method_system(x0, y0, z0, h2, n2);
     double error_euler = runge_romberg_error(sol_euler_h.y[n], sol_euler_2h.y[n2], 1);
 
-    // Для метода Эйлера-Коши
     EulerCauchySolution sol_ec_h = euler_cauchy_method_system(x0, y0, z0, h, n);
     EulerCauchySolution sol_ec_2h = euler_cauchy_method_system(x0, y0, z0, h2, n2);
     double error_ec = runge_romberg_error(sol_ec_h.y[n], sol_ec_2h.y[n2], 2);
 
-    // Для улучшенного метода Эйлера
     ImprovedEulerSolution sol_ie_h = improved_euler_method_system(x0, y0, z0, h, n);
     ImprovedEulerSolution sol_ie_2h = improved_euler_method_system(x0, y0, z0, h2, n2);
     double error_ie = runge_romberg_error(sol_ie_h.y[n], sol_ie_2h.y[n2], 2);
 
-    // Для метода Рунге-Кутты
     Solution sol_rk4_h = runge_kutta_4_method_system(x0, y0, z0, h, n);
     Solution sol_rk4_2h = runge_kutta_4_method_system(x0, y0, z0, h2, n2);
     double error_rk4 = runge_romberg_error(sol_rk4_h.y[n], sol_rk4_2h.y[n2], 4);
@@ -399,7 +360,6 @@ int main() {
     cout << "Improved Euler method (p=2):  " << error_ie << endl;
     cout << "Runge-Kutta 4 (p=4):          " << error_rk4 << endl;
 
-    // ================== СРАВНЕНИЕ С ТОЧНЫМ РЕШЕНИЕМ ==================
     cout << "\n7. COMPARISON WITH EXACT SOLUTION\n";
     cout << "==============================================\n";
 
@@ -434,7 +394,6 @@ int main() {
     }
     cout << "=====================================================================================\n";
 
-    // ================== КОМПАКТНАЯ СВОДКА (как в методичке) ==================
     cout << "\n8. COMPACT SUMMARY TABLE\n";
     cout << "==========================================================================\n";
     cout << "k" << setw(12) << "x_k" << setw(12) << "Euler" << setw(12) << "Eul-Cauchy"
@@ -452,21 +411,5 @@ int main() {
              << setw(12) << exact_solution(xk) << endl;
     }
     cout << "==========================================================================\n";
-
-    // ================== ТАБЛИЦА ПРОИЗВОДНЫХ ==================
-    cout << "\n9. DERIVATIVES TABLE (y' values)\n";
-    cout << "=====================================================\n";
-    cout << setw(8) << "x" << setw(15) << "Euler y'" << setw(15) << "RK4 y'"
-         << setw(15) << "Adams y'" << endl;
-    cout << "=====================================================\n";
-
-    for (int k = 0; k <= n; k += 2) { // Выводим через точку
-        cout << fixed << setprecision(2) << setw(8) << sol_euler.x[k]
-             << setprecision(8) << setw(15) << sol_euler.dy[k]
-             << setw(15) << sol_rk4.dy[k]
-             << setw(15) << sol_adams.dy[k] << endl;
-    }
-    cout << "=====================================================\n";
-    
     return 0;
 }
