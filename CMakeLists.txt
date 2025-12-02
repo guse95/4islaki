@@ -18,3 +18,4 @@ add_executable(Newton_mult Newtom_multiplay.cpp)
 add_executable(QR QR_Decomposition.cpp)
 
 add_subdirectory(Functions_approximation)
+add_subdirectory(Koshi)
