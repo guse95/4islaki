@@ -27,17 +27,13 @@ struct ImprovedEulerSolution {
 };
 
 double exact_solution(double x) {
-    double x_squared = x * x;
-    double exp_x2 = exp(x_squared);
-    double exp_minus_x2 = exp(-x_squared);
-    return (exp_x2 + exp_minus_x2 - 1) * exp_x2;
+    return ((exp(x) + exp(-x) - 1) * exp(x * x));
 }
 
 double f(double x, double y, double z) {
     // Здесь z = y'
-    double A = 2.0; // Из уравнения видно A=2
     double x_squared = x * x;
-    return A * x * z - (4 * x_squared - 3) * y + exp(x_squared);
+    return 4 * x * z - (4 * x_squared - 3) * y + exp(x_squared);
 }
 
 Solution euler_method_system(double x0, double y0, double z0, double h, int n) {
